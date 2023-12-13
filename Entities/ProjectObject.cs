@@ -24,6 +24,7 @@ namespace ProjectManager.Entities
         public string? CreatedBy { get; set; } //email = username
 
         public DateTime? UpdatedAt { get; set; }
+
         public string? UpdatedBy { get; set; } //email
 
         public string? Assignee { get; set; } //email
@@ -35,22 +36,17 @@ namespace ProjectManager.Entities
         [ForeignKey("StatusId")]
         public Status? Status { get; set; }
 
-        //Relations
         public ICollection<ProjectObjectHistory> ProjectObjectHistory { get; set; } = new List<ProjectObjectHistory>();
 
-        public ICollection<ProjectObjectRelation> Relations { get; set; } = new List<ProjectObjectRelation>();
+        public ICollection<ProjectObjectRelation> ProjectObjectRelations { get; set; } = new List<ProjectObjectRelation>();
+
+        public ICollection<ProjectObjectRelation> RelatedProjectObjectRelations { get; set; } = new List<ProjectObjectRelation>();
 
         public ICollection<Comments> Comments { get; set; } = new List<Comments>();
-
-        public void AddRelation(ProjectObjectRelation relation)
-        {
-            
-        }
 
         public ProjectObject(string name)
         {
             Name = name;
-            Status = new Status { Type = "To Do"};
         }
     }
 }

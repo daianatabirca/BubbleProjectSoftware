@@ -10,7 +10,10 @@ namespace ProjectManager.Entities
         public int Id { get; set; }
 
         [Required]
-        public DateTime Date { get; set; }
+        public string? CreatedBy { get; set; }
+
+        [Required]
+        public DateTime CreatedDate { get; set; }
 
         [MaxLength(200)]
         public string? Description { get; set; }

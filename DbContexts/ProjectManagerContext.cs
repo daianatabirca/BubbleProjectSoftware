@@ -15,37 +15,32 @@ namespace ProjectManager.DbContexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Project>().HasData(
-                new Project("QuarterMaster")
-                {
-                    Id = 1,
-                    Description = "POC project.",
-                },
-                new Project("LPA")
-                {
-                    Id = 2,
-                    Description = "Ongoing project.",
-                });
+            modelBuilder.Entity<ProjectObjectRelation>()
+                .HasOne(r => r.ProjectObject)
+                .WithMany(p => p.ProjectObjectRelations)
+                .HasForeignKey(r => r.ProjectObjectId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<ProjectObject>().HasData(
-                new ProjectObject("QM-323")
-                {
-                    Id = 1,
-                    Description = "Authorization.",
-                },
-                new ProjectObject("QM-242")
-                {
-                    Id = 2,
-                    Description = "Multi-Level Approval.",
-                });
+            modelBuilder.Entity<ProjectObjectRelation>()
+                .HasOne(r => r.RelatedObject)
+                .WithMany(p => p.RelatedProjectObjectRelations)
+                .HasForeignKey(r => r.RelatedObjectId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<ProjectObjectRelation>()
+                .HasIndex(por => new { por.RelationTypeId, por.ProjectObjectId, por.RelatedObjectId })
+                .IsUnique()
+                .HasDatabaseName("UniqueConstraintRelation_Index");
+
+            modelBuilder.Entity<Comments>()
+                .HasOne<ProjectObject>()
+                .WithMany(po => po.Comments)
+                .IsRequired();
+
+            modelBuilder.Entity<ProjectObject>()
+                .HasOne<Project>()
+                .WithMany(p => p.ProjectObjects)
+                .IsRequired();
         }
-
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    optionsBuilder.UseSqlite("connectionstring");
-        //    base.OnConfiguring(optionsBuilder);
-        //}
     }
 }

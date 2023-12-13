@@ -17,7 +17,6 @@ namespace ProjectManager.Entities
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
 
-        //?
         public ICollection<ProjectObject> ProjectObjects { get; set; } = new List<ProjectObject>();
 
         public Project(string name)

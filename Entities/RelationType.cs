@@ -12,6 +12,6 @@ namespace ProjectManager.Entities
         [Required]
         public string Type { get; set; } //Related, Child, Parent
 
-        public ICollection<ProjectObject> ProjectObjects { get; set; } = new List<ProjectObject>();
+        //public ICollection<ProjectObject> ProjectObjects { get; set; } = new List<ProjectObject>();
     }
 }
