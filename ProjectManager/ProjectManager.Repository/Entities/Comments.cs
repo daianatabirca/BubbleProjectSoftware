@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ProjectManager.Entities
+namespace ProjectManager.Repository.Entities
 {
     public class Comments
     {
@@ -19,5 +19,8 @@ namespace ProjectManager.Entities
 
         [MaxLength(500)]
         public string? CommentArea { get; set; }
+
+        public int ProjectObjectId { get; set; }
+        public ProjectObject ProjectObject { get; set; }
     }
 }

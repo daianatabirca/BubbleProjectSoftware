@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace ProjectManager.Entities
+namespace ProjectManager.Repository.Entities
 {
     public class ProjectObjectHistory
     {

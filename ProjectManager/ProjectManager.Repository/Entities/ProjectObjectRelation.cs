@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
 
-namespace ProjectManager.Entities
+namespace ProjectManager.Repository.Entities
 {
     public class ProjectObjectRelation
     {

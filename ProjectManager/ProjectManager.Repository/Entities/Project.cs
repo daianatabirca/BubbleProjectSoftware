@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ProjectManager.Entities
+namespace ProjectManager.Repository.Entities
 {
     public class Project
     {

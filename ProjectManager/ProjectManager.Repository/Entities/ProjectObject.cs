@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace ProjectManager.Entities
+namespace ProjectManager.Repository.Entities
 {
     public class ProjectObject
     {
@@ -10,7 +10,7 @@ namespace ProjectManager.Entities
         public int Id { get; set; }
 
         [Required]
-        public string Name { get; set; }
+        public string Title { get; set; }
 
         [MaxLength(500)]
         public string? Description { get; set; }
@@ -36,6 +36,18 @@ namespace ProjectManager.Entities
         [ForeignKey("StatusId")]
         public Status? Status { get; set; }
 
+        [Required]
+        public int ProjectObjectTypeId { get; set; }
+
+        //to do = default
+        [ForeignKey("ProjectObjectTypeId")]
+        public ProjectObjectType? ProjectObjectType { get; set; }
+
+        public int ProjectId { get; set; }
+
+        [ForeignKey("ProjectId")]
+        public Project Project { get; set; }
+
         public ICollection<ProjectObjectHistory> ProjectObjectHistory { get; set; } = new List<ProjectObjectHistory>();
 
         public ICollection<ProjectObjectRelation> ProjectObjectRelations { get; set; } = new List<ProjectObjectRelation>();
@@ -44,9 +56,9 @@ namespace ProjectManager.Entities
 
         public ICollection<Comments> Comments { get; set; } = new List<Comments>();
 
-        public ProjectObject(string name)
+        public ProjectObject(string title)
         {
-            Name = name;
+            Title = title;
         }
     }
 }

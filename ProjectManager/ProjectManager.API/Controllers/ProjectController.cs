@@ -1,8 +1,8 @@
-﻿using AutoMapper;
+﻿using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using ProjectManager.Models;
-using ProjectManager.Services;
-using System.Text.Json;
+using ProjectManager.DomainModel.Models.Requests;
+using ProjectManager.DomainModel.Models.Responses;
+using ProjectManager.Services.Mappings;
 
 namespace ProjectManager.Controllers
 {
@@ -10,23 +10,104 @@ namespace ProjectManager.Controllers
     [Route("/api/projects")]
     public class ProjectController : ControllerBase
     {
-        private readonly IProjectManagerRepository _projectManagerRepository;
-        private readonly IMapper _mapper;
+        private readonly IProjectService _projectService;
 
-        public ProjectController(IProjectManagerRepository projectManagerRepository, IMapper mapper)
+        public ProjectController(IProjectService projectService)
         {
-            _projectManagerRepository = projectManagerRepository ?? throw new ArgumentNullException(nameof(projectManagerRepository));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _projectService = projectService ?? throw new ArgumentNullException(nameof(projectService));
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProjectDto>>> GetProjects()
+        public async Task<ActionResult<IEnumerable<ProjectResponse>>> GetProjects()
         {
-
-            //From Query label with name variable responsible for filter (? bc. it can be nullable)
-            var projectEntity = await _projectManagerRepository.GetProjectsAsync();
-
-            return Ok(_mapper.Map<IEnumerable<ProjectDto>>(projectEntity)); //from profile
+            return Ok(await _projectService.GetProjectsAsync());
         }
+
+        [HttpGet("{id}", Name = "GetProject")]
+        public async Task<ActionResult<ProjectResponse>> GetProject(int id)
+        {
+            var project = await _projectService.GetProjectByIdAsync(id);
+
+            if (project == null)
+            {
+                return NotFound(); // if projects doesnt exist
+            }
+
+            return Ok(project); // 200 ok + returns the project
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<ProjectResponse>>CreateProject([FromBody] ProjectRequest projectRequest)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var createdProject = await _projectService.CreateProjectAsync(projectRequest); //it was await
+
+            return CreatedAtRoute("GetProject", new { id = createdProject.Id }, createdProject);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ProjectResponse>> UpdateProject(int id, [FromBody] ProjectRequestUpdate projectRequest)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var updatedProject = await _projectService.UpdateProjectAsync(projectRequest, id);
+
+            if (updatedProject == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(updatedProject);
+        }
+
+        [HttpPatch("{id}")]
+        public async Task<ActionResult<ProjectResponse>> PatchProject(int id, JsonPatchDocument<ProjectRequestUpdate> patchDocument)
+        {
+            if (patchDocument == null)
+            {
+                return BadRequest("Patch document is null.");
+            }
+
+            var projectToPatch = await _projectService.AddPatchAsync(id);
+
+            if (projectToPatch == null)
+            {
+                return NotFound();
+            }
+
+            patchDocument.ApplyTo(projectToPatch, ModelState);
+
+            if (!TryValidateModel(projectToPatch))
+            {
+                return BadRequest(ModelState);
+            }
+
+            var updatedProject = await _projectService.UpdateProjectAsync(projectToPatch, id);
+
+            return Ok(updatedProject);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteProject(int id)
+        {
+            var existingProject = await _projectService.GetProjectByIdAsync(id);
+
+            if (existingProject == null)
+            {
+                return NotFound();
+            }
+
+            await _projectService.DeleteProjectAsync(id);
+
+            return NoContent();
+        }
+
     }
 }

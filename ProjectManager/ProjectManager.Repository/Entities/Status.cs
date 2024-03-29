@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ProjectManager.Entities
+namespace ProjectManager.Repository.Entities
 {
     public class Status
     {
@@ -12,7 +12,6 @@ namespace ProjectManager.Entities
         [Required]
         public string Type { get; set; } //To Do, In Progress, Closed, Abandoned
 
-        public ICollection<ProjectObject> ProjectObjects { get; set; } = new List<ProjectObject>();
-
+        //public ICollection<ProjectObject> ProjectObjects { get; set; } = new List<ProjectObject>();
     }
 }
