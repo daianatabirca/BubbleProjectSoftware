@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProjectManager.Repository.Entities
 {
-    public class Comments
+    public class Comment
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -21,6 +21,7 @@ namespace ProjectManager.Repository.Entities
         public string? CommentArea { get; set; }
 
         public int ProjectObjectId { get; set; }
+
         public ProjectObject ProjectObject { get; set; }
     }
 }

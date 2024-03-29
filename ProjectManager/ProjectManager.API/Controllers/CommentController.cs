@@ -8,25 +8,25 @@ namespace CommentsManager.API.Controllers
 {
     [ApiController]
     [Route("/api/comments")]
-    public class CommentsController : ControllerBase
+    public class CommentController : ControllerBase
     {
-        private readonly ICommentsService _commentsService;
+        private readonly ICommentService _commentsService;
 
-        public CommentsController(ICommentsService commentsService)
+        public CommentController(ICommentService commentsService)
         {
             _commentsService = commentsService ?? throw new ArgumentNullException(nameof(commentsService));
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CommentsResponse>>> GetComments()
+        public async Task<ActionResult<IEnumerable<CommentResponse>>> GetComments()
         {
             return Ok(await _commentsService.GetCommentsAsync());
         }
 
         [HttpGet("{id}", Name = "GetComments")]
-        public async Task<ActionResult<CommentsResponse>> GetComments(int id)
+        public async Task<ActionResult<CommentResponse>> GetComments(int id)
         {
-            var comments = await _commentsService.GetCommentsByIdAsync(id);
+            var comments = await _commentsService.GetCommentByIdAsync(id);
 
             if (comments == null)
             {
@@ -37,27 +37,27 @@ namespace CommentsManager.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<CommentsResponse>> CreateComments([FromBody] CommentsRequest commentsRequest)
+        public async Task<ActionResult<CommentResponse>> CreateComments([FromBody] CommentRequest commentsRequest)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var createdComments = await _commentsService.CreateCommentsAsync(commentsRequest);
+            var createdComments = await _commentsService.CreateCommentAsync(commentsRequest);
 
             return CreatedAtRoute("GetComments", new { id = createdComments.Id }, createdComments);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<CommentsResponse>> UpdateComments(int id, [FromBody] CommentsRequestUpdate commentsRequest)
+        public async Task<ActionResult<CommentResponse>> UpdateComments(int id, [FromBody] CommentRequestUpdate commentsRequest)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var updatedComments = await _commentsService.UpdateCommentsAsync(commentsRequest, id);
+            var updatedComments = await _commentsService.UpdateCommentAsync(commentsRequest, id);
 
             if (updatedComments == null)
             {
@@ -68,7 +68,7 @@ namespace CommentsManager.API.Controllers
         }
 
         [HttpPatch("{id}")]
-        public async Task<ActionResult<CommentsResponse>> PatchComments(int id, JsonPatchDocument<CommentsRequestPatch> patchDocument)
+        public async Task<ActionResult<CommentResponse>> PatchComments(int id, JsonPatchDocument<CommentRequestPatch> patchDocument)
         {
             if (patchDocument == null)
             {
@@ -89,7 +89,7 @@ namespace CommentsManager.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var updatedComments = await _commentsService.UpdateCommentsPatchAsync(commentsToPatch, id);
+            var updatedComments = await _commentsService.UpdateCommentPatchAsync(commentsToPatch, id);
 
             return Ok(updatedComments);
         }
@@ -97,14 +97,14 @@ namespace CommentsManager.API.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteComments(int id)
         {
-            var existingComments = await _commentsService.GetCommentsByIdAsync(id);
+            var existingComments = await _commentsService.GetCommentByIdAsync(id);
 
             if (existingComments == null)
             {
                 return NotFound();
             }
 
-            await _commentsService.DeleteCommentsAsync(id);
+            await _commentsService.DeleteCommentAsync(id);
 
             return NoContent();
         }

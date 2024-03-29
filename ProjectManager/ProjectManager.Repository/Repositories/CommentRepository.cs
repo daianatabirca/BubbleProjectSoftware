@@ -9,39 +9,39 @@ using System.Threading.Tasks;
 
 namespace ProjectManager.Repository.Repositories
 {
-    public class CommentsRepository : ICommentsRepository
+    public class CommentRepository : ICommentRepository
     {
         private readonly ProjectManagerContext _context;
 
-        public CommentsRepository(ProjectManagerContext context)
+        public CommentRepository(ProjectManagerContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public void AddComments(Comments comments)
+        public void AddComment(Comment comments)
         {
-            _context.Comments.Add(comments);
+            _context.Comment.Add(comments);
         }
 
-        public async Task<bool> CommentsExistsAsync(int commentsId)
+        public async Task<bool> CommentExistsAsync(int commentsId)
         {
-            return await _context.Comments.AnyAsync(c => c.Id == commentsId);
+            return await _context.Comment.AnyAsync(c => c.Id == commentsId);
         }
 
-        public async Task DeleteAsync(Comments comments)
+        public async Task DeleteAsync(Comment comments)
         {
-            _context.Comments.Remove(comments);
+            _context.Comment.Remove(comments);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Comments>> GetCommentsAsync()
+        public async Task<IEnumerable<Comment>> GetCommentsAsync()
         {
-            return await _context.Comments.OrderBy(c => c.Id).ToListAsync();
+            return await _context.Comment.OrderBy(c => c.Id).ToListAsync();
         }
 
-        public async Task<Comments?> GetCommentsByIdAsync(int commentsId)
+        public async Task<Comment?> GetCommentByIdAsync(int commentsId)
         {
-            return await _context.Comments.Where(c => c.Id == commentsId).FirstOrDefaultAsync();
+            return await _context.Comment.Where(c => c.Id == commentsId).FirstOrDefaultAsync();
         }
 
         public async Task<bool> SaveChangesAsync()
@@ -57,9 +57,9 @@ namespace ProjectManager.Repository.Repositories
             }
         }
 
-        public async Task<Comments> UpdateAsync(Comments comments)
+        public async Task<Comment> UpdateAsync(Comment comments)
         {
-            _context.Comments.Update(comments);
+            _context.Comment.Update(comments);
             await _context.SaveChangesAsync();
             return comments;
         }

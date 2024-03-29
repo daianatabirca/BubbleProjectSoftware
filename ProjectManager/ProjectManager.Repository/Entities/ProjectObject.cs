@@ -54,7 +54,7 @@ namespace ProjectManager.Repository.Entities
 
         public ICollection<ProjectObjectRelation> RelatedProjectObjectRelations { get; set; } = new List<ProjectObjectRelation>();
 
-        public ICollection<Comments> Comments { get; set; } = new List<Comments>();
+        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
         public ProjectObject(string title)
         {

@@ -23,9 +23,9 @@ builder.Services.AddControllers(options =>
     .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<ProjectObjectRequestValidator>())
     .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<ProjectObjectRequestUpdateValidator>())
     .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<ProjectObjectRequestPatchValidator>())
-    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CommentsRequestValidator>())
-    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CommentsRequestUpdateValidator>())
-    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CommentsRequestPatchValidator>());
+    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CommentRequestValidator>())
+    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CommentRequestUpdateValidator>())
+    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CommentRequestPatchValidator>());
 
 //builder.Services.AddControllers(options =>
 //{
@@ -60,8 +60,8 @@ builder.Services.AddScoped<IProjectObjectTypeService, ProjectObjectTypeService>(
 builder.Services.AddScoped<IProjectObjectRepository, ProjectObjectRepository>();
 builder.Services.AddScoped<IProjectObjectService, ProjectObjectService>();
 
-builder.Services.AddScoped<ICommentsRepository, CommentsRepository>();
-builder.Services.AddScoped<ICommentsService, CommentsService>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<ICommentService, CommentService>();
 
 //builder.Services.AddTransient<IValidator<ProjectManager.DomainModel.Models.Requests.ProjectRequestDTO>, ProjectRequestValidator>();
 

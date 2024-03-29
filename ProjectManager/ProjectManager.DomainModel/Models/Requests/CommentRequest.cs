@@ -1,10 +1,10 @@
 ﻿namespace ProjectManager.DomainModel.Models.Requests
 {
-    public class CommentsRequestPatch
+    public class CommentRequest
     {
         public string? Username { get; set; } //email = username
 
-        public DateTime UpdatedDate { get; set; } = DateTime.Now;
+        public DateTime InsertDate { get; set; }
 
         public string? CommentArea { get; set; }
 

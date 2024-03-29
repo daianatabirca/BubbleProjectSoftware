@@ -15,6 +15,12 @@ namespace ProjectManager.Repository.Entities
         [Required]
         public DateTime CreatedDate { get; set; }
 
+        [Required]
+        public string? UpdatedBy { get; set; }
+
+        [Required]
+        public DateTime UpdatedDate { get; set; }
+
         [MaxLength(200)]
         public string? Description { get; set; }
 

@@ -1,6 +1,6 @@
 ﻿namespace ProjectManager.DomainModel.Models.Requests
 {
-    public class CommentsRequestUpdate
+    public class CommentRequestUpdate
     {
         public string? Username { get; set; } //email = username
 

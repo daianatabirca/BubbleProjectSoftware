@@ -1,6 +1,6 @@
 ﻿namespace ProjectManager.DomainModel.Models.Responses
 {
-    public class CommentsResponse
+    public class CommentResponse
     {
         public int Id { get; set; }
 

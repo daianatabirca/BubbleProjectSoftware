@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectManager.DbContexts;
 
@@ -10,9 +11,10 @@ using ProjectManager.DbContexts;
 namespace ProjectManager.Repository.Migrations
 {
     [DbContext(typeof(ProjectManagerContext))]
-    partial class ProjectManagerContextModelSnapshot : ModelSnapshot
+    [Migration("20240329140837_UpdateCommentsTableName_To_Comment")]
+    partial class UpdateCommentsTableName_To_Comment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.25");
@@ -44,7 +46,7 @@ namespace ProjectManager.Repository.Migrations
 
                     b.HasIndex("ProjectObjectId");
 
-                    b.ToTable("Comment");
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("ProjectManager.Repository.Entities.Project", b =>

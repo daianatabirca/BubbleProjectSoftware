@@ -7,7 +7,7 @@ namespace ProjectManager.DbContexts
     {
         public DbSet<Project> Project { get; set; } = null!;
         public DbSet<Status> Status { get; set; } = null!;
-        public DbSet<Comments> Comments { get; set; } = null!;
+        public DbSet<Comment> Comment { get; set; } = null!;
         public DbSet<RelationType> RelationType { get; set; } = null!;
         public DbSet<ProjectObjectType> ProjectObjectType { get; set; } = null!;
         public DbSet<ProjectObject> ProjectObject { get; set; } = null!;
@@ -46,7 +46,7 @@ namespace ProjectManager.DbContexts
             //    .WithMany(po => po.Comments)
             //    .IsRequired();
 
-            modelBuilder.Entity<Comments>()
+            modelBuilder.Entity<Comment>()
                 .HasOne(c => c.ProjectObject)
                 .WithMany(po => po.Comments)
                 .HasForeignKey(c => c.ProjectObjectId)

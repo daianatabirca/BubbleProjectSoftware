@@ -3,11 +3,11 @@ using ProjectManager.DomainModel.Models.Requests;
 
 namespace ProjectManager.API.FluentValidations
 {
-    public class CommentsRequestValidator : AbstractValidator<CommentsRequest>
+    public class CommentRequestUpdateValidator : AbstractValidator<CommentRequestUpdate>
     {
-        public CommentsRequestValidator()
-        {
-            RuleFor(c => c.InsertDate).NotEmpty().WithMessage("Comments updated date field is required.");
+        public CommentRequestUpdateValidator() 
+        { 
+            RuleFor(c => c.UpdatedDate).NotEmpty().WithMessage("Comments updated date field is required.");
             RuleFor(c => c.Username).NotEmpty().WithMessage("Username is required.");
             RuleFor(c => c.CommentArea).NotEmpty().WithMessage("Comment area is required.");
 
