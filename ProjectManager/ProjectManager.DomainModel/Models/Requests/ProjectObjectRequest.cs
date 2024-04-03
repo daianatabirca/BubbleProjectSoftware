@@ -1,6 +1,4 @@
-﻿using ProjectManager.Repository.Entities;
-
-namespace ProjectManager.DomainModel.Models.Requests
+﻿namespace ProjectManager.DomainModel.Models.Requests
 {
     public class ProjectObjectRequest
     {

@@ -34,11 +34,6 @@ namespace ProjectManager.Repository.Repositories
             return await _context.ProjectObjectType.OrderBy(po => po.Type).ToListAsync();
         }
 
-        public bool ProjectObjectTypeExists(int projectObjectTypeId)
-        {
-            return _context.ProjectObjectType.Any(po => po.Id == projectObjectTypeId);
-        }
-
         public async Task<bool> ProjectObjectTypeExistsAsync(int projectObjectTypeId)
         {
             return await _context.ProjectObjectType.AnyAsync(po => po.Id == projectObjectTypeId);

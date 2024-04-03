@@ -1,29 +1,24 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
-using ProjectManager.DomainModel.Models.Enums;
 using ProjectManager.DomainModel.Models.Requests;
 using ProjectManager.DomainModel.Models.Responses;
 using ProjectManager.Repository.Entities;
 using ProjectManager.Repository.Repositories;
-using System;
+using ProjectManager.Services.DTOs;
 
 namespace ProjectManager.Services.Mappings
 {
     public class ProjectObjectService : IProjectObjectService
     {
         private readonly IProjectObjectRepository _projectObjectRepository;
+        private readonly IProjectObjectHistoryRepository _projectObjectHistoryRepository;
         private readonly IProjectManagerRepository _projectRepository;
-        private readonly IStatusRepository _statusRepository;
-        private readonly IProjectObjectTypeRepository _projectObjectTypeRepository;
         private readonly IMapper _mapper;
 
-        public ProjectObjectService(IProjectObjectRepository projectObjectRepository, IProjectObjectTypeRepository projectObjectTypeRepository, IStatusRepository statusRepository, IProjectManagerRepository projectRepository, IMapper mapper)
+        public ProjectObjectService(IProjectObjectRepository projectObjectRepository, IProjectObjectHistoryRepository projectObjectHistoryRepository, IProjectManagerRepository projectRepository, IMapper mapper)
         {
             _projectObjectRepository = projectObjectRepository ?? throw new ArgumentNullException(nameof(projectObjectRepository));
+            _projectObjectHistoryRepository = projectObjectHistoryRepository ?? throw new ArgumentNullException(nameof(projectObjectHistoryRepository));
             _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
-            _projectObjectTypeRepository = projectObjectTypeRepository ?? throw new ArgumentNullException(nameof(projectObjectTypeRepository));
-            _statusRepository = statusRepository ?? throw new ArgumentNullException(nameof(statusRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
@@ -76,17 +71,28 @@ namespace ProjectManager.Services.Mappings
             //    throw new Exception("ProjectObjectTypeId does not exist!");
             //}
 
-
             var projectObjectEntity = _mapper.Map<ProjectObject>(projectObjectRequest);
-
-            //are these 2 lines necessary?
-            projectObjectEntity.ProjectId = projectObjectRequest.ProjectId;
-            await _projectObjectRepository.SaveChangesAsync();
 
             _projectObjectRepository.AddProjectObject(projectObjectEntity);
 
             if (await _projectObjectRepository.SaveChangesAsync())
             {
+                //ADD in ProjectObjectHistory table
+                //create the history object
+                ProjectObjectHistoryDTO projectObjectHistoryDTO = new ProjectObjectHistoryDTO();
+
+                projectObjectHistoryDTO.CreatedBy = projectObjectRequest.CreatedBy;
+                projectObjectHistoryDTO.CreatedDate = projectObjectRequest.CreatedAt;
+                projectObjectHistoryDTO.Description = "Project Object '" + projectObjectRequest.Title + "' was created.";
+                projectObjectHistoryDTO.ProjectObjectId = projectObjectEntity.Id;
+
+                //map the history object -> to history entity
+                var projectObjectHistoryEntity = _mapper.Map<ProjectObjectHistory>(projectObjectHistoryDTO);
+
+                _projectObjectHistoryRepository.AddProjectObjectHistory(projectObjectHistoryEntity);
+                await _projectObjectHistoryRepository.SaveChangesAsync();
+                //check ProjectObjectHistory
+
                 return _mapper.Map<ProjectObjectResponse>(projectObjectEntity);
             }
 
@@ -101,6 +107,26 @@ namespace ProjectManager.Services.Mappings
             {
                 throw new Exception("Project not found");
             }
+
+            //To be redefined for best option
+            //Update in ProjectObjectHistory table
+            //Create the POHistory object
+            ProjectObjectHistoryDTO projectObjectHistoryDTO = new ProjectObjectHistoryDTO();
+
+            projectObjectHistoryDTO.UpdatedBy = existingProjectObject.UpdatedBy;
+            projectObjectHistoryDTO.UpdatedDate = existingProjectObject.UpdatedAt;
+            projectObjectHistoryDTO.CreatedBy = existingProjectObject.CreatedBy;
+            projectObjectHistoryDTO.UpdatedBy = existingProjectObject.UpdatedBy;
+            projectObjectHistoryDTO.Description = "Project Object '" + existingProjectObject.Title + "' was deleted.";
+            //projectObjectHistoryDTO.ProjectObjectId = intermediateProjectObject.Id;
+            projectObjectHistoryDTO.ProjectObjectId = projectObjectId;
+
+            //map the history object -> to history entity
+            var projectObjectHistoryEntity = _mapper.Map<ProjectObjectHistory>(projectObjectHistoryDTO);
+
+            _projectObjectHistoryRepository.AddProjectObjectHistory(projectObjectHistoryEntity);
+            await _projectObjectHistoryRepository.SaveChangesAsync();
+            //check ProjectObjectHistory
 
             await _projectObjectRepository.DeleteAsync(existingProjectObject);
         }
@@ -154,9 +180,28 @@ namespace ProjectManager.Services.Mappings
                 return null;
             }
 
-            var intermediateProjectObject = _mapper.Map(projectObjectRequestUpdate, existingProjectObject);
+            var intermediateProjectObject = _mapper.Map(projectObjectRequestUpdate, existingProjectObject); //updated po entity
 
             var updatedProjectObject = await _projectObjectRepository.UpdateAsync(intermediateProjectObject);
+
+            //Update in ProjectObjectHistory table
+            //Create the POHistory object
+            ProjectObjectHistoryDTO projectObjectHistoryDTO = new ProjectObjectHistoryDTO();
+
+            projectObjectHistoryDTO.UpdatedBy = projectObjectRequestUpdate.UpdatedBy;
+            projectObjectHistoryDTO.UpdatedDate = projectObjectRequestUpdate.UpdatedAt;
+            projectObjectHistoryDTO.CreatedBy = intermediateProjectObject.CreatedBy;
+            projectObjectHistoryDTO.CreatedDate = intermediateProjectObject.CreatedAt;
+            projectObjectHistoryDTO.Description = "Project Object '" + projectObjectRequestUpdate.Title + "' was updated.";
+            //projectObjectHistoryDTO.ProjectObjectId = intermediateProjectObject.Id;
+            projectObjectHistoryDTO.ProjectObjectId = projectObjectId;
+
+            //map the history object -> to history entity
+            var projectObjectHistoryEntity = _mapper.Map<ProjectObjectHistory>(projectObjectHistoryDTO);
+
+            _projectObjectHistoryRepository.AddProjectObjectHistory(projectObjectHistoryEntity);
+            await _projectObjectHistoryRepository.SaveChangesAsync();
+            //check ProjectObjectHistory
 
             var updatedProjectObjectDto = _mapper.Map<ProjectObject, ProjectObjectResponse>(updatedProjectObject);
 
@@ -196,6 +241,24 @@ namespace ProjectManager.Services.Mappings
             var intermediateProjectObject = _mapper.Map(projectObjectRequestUpdate, existingProjectObject);
 
             var updatedProjectObject = await _projectObjectRepository.UpdateAsync(intermediateProjectObject);
+
+            //Update in ProjectObjectHistory table
+            //Create the POHistory object
+            ProjectObjectHistoryDTO projectObjectHistoryDTO = new ProjectObjectHistoryDTO();
+
+            projectObjectHistoryDTO.UpdatedBy = projectObjectRequestUpdate.UpdatedBy;
+            projectObjectHistoryDTO.UpdatedDate = projectObjectRequestUpdate.UpdatedAt;
+            projectObjectHistoryDTO.CreatedBy = intermediateProjectObject.CreatedBy;
+            projectObjectHistoryDTO.CreatedDate = intermediateProjectObject.CreatedAt;
+            projectObjectHistoryDTO.Description = "Project Object '" + projectObjectRequestUpdate.Title + "' was updated.";
+            projectObjectHistoryDTO.ProjectObjectId = projectObjectId;
+
+            //map the history object -> to history entity
+            var projectObjectHistoryEntity = _mapper.Map<ProjectObjectHistory>(projectObjectHistoryDTO);
+
+            _projectObjectHistoryRepository.AddProjectObjectHistory(projectObjectHistoryEntity);
+            await _projectObjectHistoryRepository.SaveChangesAsync();
+            //check ProjectObjectHistory
 
             var updatedProjectObjectDto = _mapper.Map<ProjectObject, ProjectObjectResponse>(updatedProjectObject);
 

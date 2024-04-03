@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ProjectManager.DomainModel.Models.Requests;
 using ProjectManager.DomainModel.Models.Responses;
+
 namespace ProjectManager.Services.Profiles
 {
     public class ProjectProfile : Profile

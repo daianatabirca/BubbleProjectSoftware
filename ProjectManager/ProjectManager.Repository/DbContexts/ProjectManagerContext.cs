@@ -11,6 +11,8 @@ namespace ProjectManager.DbContexts
         public DbSet<RelationType> RelationType { get; set; } = null!;
         public DbSet<ProjectObjectType> ProjectObjectType { get; set; } = null!;
         public DbSet<ProjectObject> ProjectObject { get; set; } = null!;
+        public DbSet<ProjectObjectHistory> ProjectObjectHistory { get; set; } = null!;
+        public DbSet<ProjectObjectRelation> ProjectObjectRelation { get; set; } = null!;
 
         public ProjectManagerContext(DbContextOptions<ProjectManagerContext> options) : base(options)
         {

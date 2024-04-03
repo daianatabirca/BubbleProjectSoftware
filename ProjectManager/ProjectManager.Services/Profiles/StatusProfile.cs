@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
 using ProjectManager.DomainModel.Models.Requests;
 using ProjectManager.DomainModel.Models.Responses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+
 namespace ProjectManager.Services.Profiles
 {
     public class StatusProfile : Profile

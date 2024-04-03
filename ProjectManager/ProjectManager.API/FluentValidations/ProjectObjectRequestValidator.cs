@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using ProjectManager.DomainModel.Models.Requests;
-using ProjectManager.Repository.Repositories;
 
 namespace ProjectManager.API.FluentValidations
 {
@@ -9,7 +8,9 @@ namespace ProjectManager.API.FluentValidations
         public ProjectObjectRequestValidator() 
         {
             RuleFor(po => po.Title).NotEmpty().WithMessage("Project Object Title is required.");
-            //RuleFor(po => po.Status).NotEmpty().WithMessage("Project Object Status is required.");
+            RuleFor(po => po.StatusId).NotEmpty().WithMessage("Project Object Status Id is required.");
+            RuleFor(po => po.ProjectId).NotEmpty().WithMessage("Project Id is required.");
+            RuleFor(po => po.ProjectObjectTypeId).NotEmpty().WithMessage("Project Object Type Id is required.");
             RuleFor(po => po.CreatedAt).NotEmpty().WithMessage("Project Object Creation Time is required.");
             RuleFor(po => po.CreatedBy).NotEmpty().WithMessage("Project Object CreationBy field is required.");
             RuleFor(po => po.Description).NotEmpty().WithMessage("Project Object Description is required.");

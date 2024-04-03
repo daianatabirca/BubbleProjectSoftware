@@ -63,6 +63,12 @@ builder.Services.AddScoped<IProjectObjectService, ProjectObjectService>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 
+builder.Services.AddScoped<IProjectObjectHistoryRepository, ProjectObjectHistoryRepository>();
+builder.Services.AddScoped<IProjectObjectHistoryService, ProjectObjectHistoryService>();
+
+builder.Services.AddScoped<IProjectObjectRelationRepository, ProjectObjectRelationRepository>();
+builder.Services.AddScoped<IProjectObjectRelationService, ProjectObjectRelationService>();
+
 //builder.Services.AddTransient<IValidator<ProjectManager.DomainModel.Models.Requests.ProjectRequestDTO>, ProjectRequestValidator>();
 
 
