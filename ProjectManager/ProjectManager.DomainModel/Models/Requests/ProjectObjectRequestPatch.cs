@@ -8,7 +8,7 @@
 
         public int SprintNumber { get; set; }
 
-        public DateTime? UpdatedAt { get; set; } = DateTime.Now;
+        public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
 
         public string? UpdatedBy { get; set; } //email
 

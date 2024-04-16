@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using ProjectManager.API.Utils;
 using ProjectManager.DomainModel.Models.Requests;
 using ProjectManager.DomainModel.Models.Responses;
 using ProjectManager.Services.Mappings;
+using Serilog;
+using System.Net;
 
 namespace ProjectManager.Controllers
 {
@@ -11,9 +14,11 @@ namespace ProjectManager.Controllers
     public class ProjectController : ControllerBase
     {
         private readonly IProjectService _projectService;
+        //private readonly ILogger<ProjectController> _logger;
 
         public ProjectController(IProjectService projectService)
         {
+            //_logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _projectService = projectService ?? throw new ArgumentNullException(nameof(projectService));
         }
 
@@ -26,14 +31,28 @@ namespace ProjectManager.Controllers
         [HttpGet("{id}", Name = "GetProject")]
         public async Task<ActionResult<ProjectResponse>> GetProject(int id)
         {
-            var project = await _projectService.GetProjectByIdAsync(id);
+            ProjectResponse project;
 
-            if (project == null)
+            try
             {
-                return NotFound(); // if projects doesnt exist
+                project = await _projectService.GetProjectByIdAsync(id);
             }
 
-            return Ok(project); // 200 ok + returns the project
+            catch (Exception ex)
+            {
+                ErrorResponse errorResponse = new ErrorResponse
+                {
+                    Message = ex.Message,
+                    ErrorCode = (int)HttpStatusCode.BadRequest
+                };
+
+                //_logger.LogError("Error accrued at {now}", DateTime.Now);
+                Log.Error("Error accrued at {now}", DateTime.Now);
+                Log.Error($"Error: {errorResponse.ErrorCode}, {errorResponse.Message}");
+                return StatusCode((int)HttpStatusCode.BadRequest, errorResponse);
+            }
+
+            return Ok(project);
         }
 
         [HttpPost]
@@ -44,8 +63,25 @@ namespace ProjectManager.Controllers
                 return BadRequest(ModelState);
             }
 
-            var createdProject = await _projectService.CreateProjectAsync(projectRequest); //it was await
+            ProjectResponse createdProject;
 
+            try
+            {
+                createdProject = await _projectService.CreateProjectAsync(projectRequest);
+            }
+            catch (Exception ex)
+            {
+                ErrorResponse errorResponse = new ErrorResponse
+                {
+                    Message = ex.Message,
+                    ErrorCode = (int)HttpStatusCode.InternalServerError
+                };
+
+                Log.Error("Error accrued at {now}", DateTime.Now);
+                Log.Error($"Error: {errorResponse.ErrorCode}, {errorResponse.Message}");
+                return StatusCode((int)HttpStatusCode.InternalServerError, errorResponse);
+            }
+            
             return CreatedAtRoute("GetProject", new { id = createdProject.Id }, createdProject);
         }
 
@@ -57,29 +93,55 @@ namespace ProjectManager.Controllers
                 return BadRequest(ModelState);
             }
 
-            var updatedProject = await _projectService.UpdateProjectAsync(projectRequest, id);
+            ProjectResponse updatedProject;
 
-            if (updatedProject == null)
+            try
             {
-                return NotFound();
+                updatedProject = await _projectService.UpdateProjectAsync(projectRequest, id);
+            }
+
+            catch (Exception ex)
+            {
+                ErrorResponse errorResponse = new ErrorResponse
+                {
+                    Message = ex.Message,
+                    ErrorCode = (int)HttpStatusCode.BadRequest
+                };
+
+                Log.Error("Error accrued at {now}", DateTime.Now);
+                Log.Error($"Error: {errorResponse.ErrorCode}, {errorResponse.Message}");
+                return StatusCode((int)HttpStatusCode.BadRequest, errorResponse);
             }
 
             return Ok(updatedProject);
         }
 
         [HttpPatch("{id}")]
-        public async Task<ActionResult<ProjectResponse>> PatchProject(int id, JsonPatchDocument<ProjectRequestUpdate> patchDocument)
+        public async Task<ActionResult<ProjectResponse>> PatchProject(int id, JsonPatchDocument<ProjectRequestPatch> patchDocument)
         {
             if (patchDocument == null)
             {
                 return BadRequest("Patch document is null.");
             }
 
-            var projectToPatch = await _projectService.AddPatchAsync(id);
+            ProjectRequestPatch projectToPatch;
 
-            if (projectToPatch == null)
+            try
             {
-                return NotFound();
+                projectToPatch = await _projectService.AddPatchAsync(id);
+            }
+
+            catch (Exception ex)
+            {
+                ErrorResponse errorResponse = new ErrorResponse
+                {
+                    Message = ex.Message,
+                    ErrorCode = (int)HttpStatusCode.BadRequest
+                };
+
+                Log.Error("Error accrued at {now}", DateTime.Now);
+                Log.Error($"Error: {errorResponse.ErrorCode}, {errorResponse.Message}");
+                return StatusCode((int)HttpStatusCode.BadRequest, errorResponse);
             }
 
             patchDocument.ApplyTo(projectToPatch, ModelState);
@@ -89,7 +151,25 @@ namespace ProjectManager.Controllers
                 return BadRequest(ModelState);
             }
 
-            var updatedProject = await _projectService.UpdateProjectAsync(projectToPatch, id);
+            ProjectResponse updatedProject;
+
+            try
+            {
+                updatedProject = await _projectService.UpdateProjectPatchAsync(projectToPatch, id);
+            }
+
+            catch (Exception ex)
+            {
+                ErrorResponse errorResponse = new ErrorResponse
+                {
+                    Message = ex.Message,
+                    ErrorCode = (int)HttpStatusCode.BadRequest
+                };
+
+                Log.Error("Error accrued at {now}", DateTime.Now);
+                Log.Error($"Error: {errorResponse.ErrorCode}, {errorResponse.Message}");
+                return StatusCode((int)HttpStatusCode.BadRequest, errorResponse);
+            }
 
             return Ok(updatedProject);
         }
@@ -97,14 +177,43 @@ namespace ProjectManager.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteProject(int id)
         {
-            var existingProject = await _projectService.GetProjectByIdAsync(id);
+            ProjectResponse existingProject;
 
-            if (existingProject == null)
+            try
             {
-                return NotFound();
+                existingProject = await _projectService.GetProjectByIdAsync(id);
             }
 
-            await _projectService.DeleteProjectAsync(id);
+            catch (Exception ex)
+            {
+                ErrorResponse errorResponse = new ErrorResponse
+                {
+                    Message = ex.Message,
+                    ErrorCode = (int)HttpStatusCode.BadRequest
+                };
+
+                Log.Error("Error accrued at {now}", DateTime.Now);
+                Log.Error($"Error: {errorResponse.ErrorCode}, {errorResponse.Message}");
+                return StatusCode((int)HttpStatusCode.BadRequest, errorResponse); 
+            }
+
+            try
+            {
+                await _projectService.DeleteProjectAsync(id);
+            }
+
+            catch (Exception ex)
+            {
+                ErrorResponse errorResponse = new ErrorResponse
+                {
+                    Message = ex.Message,
+                    ErrorCode = (int)HttpStatusCode.BadRequest
+                };
+
+                Log.Error("Error accrued at {now}", DateTime.Now);
+                Log.Error($"Error: {errorResponse.ErrorCode}, {errorResponse.Message}");
+                return StatusCode((int)HttpStatusCode.BadRequest, errorResponse);
+            }
 
             return NoContent();
         }

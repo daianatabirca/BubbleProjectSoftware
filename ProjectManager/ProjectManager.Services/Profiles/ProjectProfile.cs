@@ -13,6 +13,9 @@ namespace ProjectManager.Services.Profiles
             CreateMap<Repository.Entities.Project, ProjectResponse>();
             CreateMap<Repository.Entities.Project, ProjectRequestUpdate>();
             CreateMap<ProjectRequestUpdate, Repository.Entities.Project>();
+            CreateMap<Repository.Entities.Project, ProjectRequestPatch>();
+            CreateMap<ProjectRequestPatch, Repository.Entities.Project>();
+            CreateMap<ProjectResponse, ProjectRequestPatch>();
             CreateMap<ProjectResponse, Repository.Entities.Project>();
         }
     }

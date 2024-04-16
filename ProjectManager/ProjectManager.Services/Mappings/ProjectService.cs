@@ -4,6 +4,7 @@ using ProjectManager.DomainModel.Models.Requests;
 using ProjectManager.DomainModel.Models.Responses;
 using ProjectManager.Repository.Entities;
 using ProjectManager.Repository.Repositories;
+using ProjectManager.Services.Exceptions;
 
 namespace ProjectManager.Services.Mappings
 {
@@ -40,23 +41,28 @@ namespace ProjectManager.Services.Mappings
                 return _mapper.Map<ProjectResponse>(projectEntity);
             }
 
-            return null; // continue if saving failed
+            throw new InternalServerErrorException("The project could not be saved in database.");
         }
 
-        public async Task<ProjectResponse?> GetProjectByIdAsync(int projectId)
+        public async Task<ProjectResponse> GetProjectByIdAsync(int projectId)
         {
             var project = await _projectManagerRepository.GetProjectByIdAsync(projectId);
+
+            if (project == null)
+            {
+                throw new BadRequestException("The project was not found.");
+            }
 
             return (_mapper.Map<Project, ProjectResponse>(project));
         }
 
-        public async Task<ProjectResponse?> UpdateProjectAsync(ProjectRequestUpdate projectRequest, int projectId)
+        public async Task<ProjectResponse> UpdateProjectAsync(ProjectRequestUpdate projectRequest, int projectId)
         {
             var existingProject = await _projectManagerRepository.GetProjectByIdAsync(projectId);
 
             if (existingProject == null)
             {
-                return null;
+                throw new BadRequestException("The project was not found.");
             }
 
             var intermediateProject = _mapper.Map(projectRequest, existingProject);
@@ -68,16 +74,16 @@ namespace ProjectManager.Services.Mappings
             return updatedProjectDto;
         }
 
-        public async Task<ProjectRequestUpdate?> AddPatchAsync(int projectId)
+        public async Task<ProjectRequestPatch> AddPatchAsync(int projectId)
         {
             var existingProject = await GetProjectByIdAsync(projectId);
 
             if (existingProject == null)
             {
-                return null;
+                throw new BadRequestException("The project was not found.");
             }
 
-            var projectToPatch = _mapper.Map<ProjectRequestUpdate>(existingProject);
+            var projectToPatch = _mapper.Map<ProjectRequestPatch>(existingProject);
             return projectToPatch;
         }
 
@@ -87,10 +93,28 @@ namespace ProjectManager.Services.Mappings
 
             if (existingProject == null)
             {
-                throw new Exception("Project not found");
+                throw new BadRequestException("The project was not found.");
             }
 
             await _projectManagerRepository.DeleteAsync(existingProject);
+        }
+
+        public async Task<ProjectResponse> UpdateProjectPatchAsync(ProjectRequestPatch projectRequest, int projectId)
+        {
+            var existingProject = await _projectManagerRepository.GetProjectByIdAsync(projectId);
+
+            if (existingProject == null)
+            {
+                throw new BadRequestException("The project was not found.");
+            }
+
+            var intermediateProject = _mapper.Map(projectRequest, existingProject);
+
+            var updatedProject = await _projectManagerRepository.UpdateAsync(intermediateProject);
+
+            var updatedProjectDto = _mapper.Map<Project, ProjectResponse>(updatedProject);
+
+            return updatedProjectDto;
         }
     }
 }

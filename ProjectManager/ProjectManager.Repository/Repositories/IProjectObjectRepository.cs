@@ -9,8 +9,6 @@ namespace ProjectManager.Repository.Repositories
 
         Task<bool> ProjectObjectExistsAsync(int projectObjectId);
 
-        //bool ProjectObjectExists(int projectObjectId);
-
         void AddProjectObject(ProjectObject projectObject);
 
         Task<bool> SaveChangesAsync();

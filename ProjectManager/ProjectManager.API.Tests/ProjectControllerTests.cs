@@ -14,6 +14,7 @@ namespace ProjectManager.API.UnitTests
         [Fact]
         public async Task CreateProject_Test()
         {
+
             //Numele metodei pe care vreau sa o testez + (When) Cazul testat + (Then) Ceea ce returneaza
             // Arrange
             ProjectRequest projectRequest = new ProjectRequest()
@@ -50,7 +51,7 @@ namespace ProjectManager.API.UnitTests
             var controller = new ProjectController(mockService.Object);
 
             // Act
-            var result = controller.GetProjects();
+            var result = await controller.GetProjects();
 
             // Assert
             var viewResult = Assert.IsType<Task<ActionResult<IEnumerable<ProjectResponse>>>>(result);
@@ -69,7 +70,7 @@ namespace ProjectManager.API.UnitTests
             var controller = new ProjectController(mockService.Object);
 
             // Act
-            var result = controller.GetProject(0);
+            var result = await controller.GetProject(0);
 
             // Assert
             var viewResult = Assert.IsType<Task<ActionResult<ProjectResponse>>>(result);
@@ -80,11 +81,13 @@ namespace ProjectManager.API.UnitTests
 
         private async Task<ProjectResponse> GetSession()
         {
-            var project = new ProjectResponse() {
-                    Name = "Name1",
-                    Description = "Test One",
-                    StartDate = new DateTime(2016, 7, 2),
-                    EndDate = new DateTime(2018, 9, 4)};
+            var project = new ProjectResponse()
+            {
+                Name = "Name1",
+                Description = "Test One",
+                StartDate = new DateTime(2016, 7, 2),
+                EndDate = new DateTime(2018, 9, 4)
+            };
 
             return project;
         }

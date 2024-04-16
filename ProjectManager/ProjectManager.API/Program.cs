@@ -1,3 +1,4 @@
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
@@ -5,36 +6,40 @@ using ProjectManager.API.FluentValidations;
 using ProjectManager.DbContexts;
 using ProjectManager.Repository.Repositories;
 using ProjectManager.Services.Mappings;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .WriteTo.Console()
+    .WriteTo.File("logs/projectManager.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Host.UseSerilog();
+
 // Add services to the container.
 
-//builder.Services.AddControllers();
 builder.Services.AddControllers(options =>
 {
     options.ReturnHttpNotAcceptable = true;
 }).AddNewtonsoftJson()
-.AddXmlDataContractSerializerFormatters()
-    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<ProjectRequestValidator>())
-    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<StatusRequestValidator>())
-    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<RelationTypeRequestValidator>())
-    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<ProjectObjectTypeRequestValidator>())
-    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<ProjectObjectRequestValidator>())
-    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<ProjectObjectRequestUpdateValidator>())
-    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<ProjectObjectRequestPatchValidator>())
-    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CommentRequestValidator>())
-    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CommentRequestUpdateValidator>())
-    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CommentRequestPatchValidator>());
+.AddXmlDataContractSerializerFormatters();
 
-//builder.Services.AddControllers(options =>
-//{
-//    options.ReturnHttpNotAcceptable = true;
-//}).AddNewtonsoftJson()
-//.AddXmlDataContractSerializerFormatters();
-
-//builder.Services.AddValidatorsFromAssemblyContaining<ProjectRequestValidator>();
-
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssembly(typeof(ProjectRequestValidator).Assembly);
+builder.Services.AddValidatorsFromAssembly(typeof(ProjectRequestUpdateValidator).Assembly);
+builder.Services.AddValidatorsFromAssembly(typeof(ProjectRequestPatchValidator).Assembly);
+builder.Services.AddValidatorsFromAssembly(typeof(StatusRequestValidator).Assembly);
+builder.Services.AddValidatorsFromAssembly(typeof(RelationTypeRequestValidator).Assembly);
+builder.Services.AddValidatorsFromAssembly(typeof(ProjectObjectTypeRequestValidator).Assembly);
+builder.Services.AddValidatorsFromAssembly(typeof(ProjectObjectRequestValidator).Assembly);
+builder.Services.AddValidatorsFromAssembly(typeof(ProjectObjectRequestUpdateValidator).Assembly);
+builder.Services.AddValidatorsFromAssembly(typeof(ProjectObjectRequestPatchValidator).Assembly);
+builder.Services.AddValidatorsFromAssembly(typeof(CommentRequestValidator).Assembly);
+builder.Services.AddValidatorsFromAssembly(typeof(CommentRequestUpdateValidator).Assembly);
+builder.Services.AddValidatorsFromAssembly(typeof(CommentRequestPatchValidator).Assembly);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -69,12 +74,8 @@ builder.Services.AddScoped<IProjectObjectHistoryService, ProjectObjectHistorySer
 builder.Services.AddScoped<IProjectObjectRelationRepository, ProjectObjectRelationRepository>();
 builder.Services.AddScoped<IProjectObjectRelationService, ProjectObjectRelationService>();
 
-//builder.Services.AddTransient<IValidator<ProjectManager.DomainModel.Models.Requests.ProjectRequestDTO>, ProjectRequestValidator>();
-
-
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-//builder.Services.AddAutoMapper(typeof(ProjectProfile));
-
+ 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -85,13 +86,12 @@ if (app.Environment.IsDevelopment())
 }
 
 //Midlewares
+
 app.UseHttpsRedirection();
 
 app.UseRouting();
 
 app.UseAuthorization();
-
-//app.MapControllers();
 
 app.UseEndpoints(endpoints =>
 {
